@@ -1,0 +1,1 @@
+python3 -W ignore -m unittest __tests__/test_MeldRxClient.py -v
