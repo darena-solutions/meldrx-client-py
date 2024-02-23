@@ -1,5 +1,0 @@
-BASE_URL = ""
-TOKEN_URL = ""
-CLIENT_ID = ""
-CLIENT_SECRET = ""
-SCOPE = "system/*.read"

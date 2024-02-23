@@ -1,5 +1,6 @@
 import requests
 import base64
+import json
 
 class FHIRClient:
     def __init__(self, base_url, access_token, access_token_type):
@@ -7,10 +8,15 @@ class FHIRClient:
         self.access_token = access_token
         self.access_token_type = access_token_type
 
+    # Initialize the FHIRClient with no authentication...
+    @staticmethod
+    def for_no_auth(base_url):
+        return FHIRClient(base_url, None, None)
+
     # Initialize the FHIRClient with a Bearer token...
     @staticmethod
-    def for_bearer_token(accessToken):
-        return FHIRClient(None, accessToken, "Bearer")
+    def for_bearer_token(base_url, accessToken):
+        return FHIRClient(base_url, accessToken, "Bearer")
 
     # Initialize the FHIRClient for Basic Auth...
     @staticmethod
@@ -21,31 +27,33 @@ class FHIRClient:
         return FHIRClient(base_url, access_token, "Basic")
 
     # Read a FHIR resource...
-    def readResource(self, resourceType, resourceId):
+    def read_resource(self, resourceType, resourceId):
         url = self.__construct_fhir_url(resourceType, resourceId)
         response = requests.get(url, headers=self.__get_headers())
         return response.json()
 
     # Search for a FHIR resource...
-    def searchResource(self, resourceType, params):
+    def search_resource(self, resourceType, params):
         url = self.__construct_fhir_url(resourceType)
         response = requests.get(url, params, headers=self.__get_headers())
         return response.json()
 
     # Create a FHIR resource...
-    def createResource(self, resourceType, data):
+    def create_resource(self, resourceType, data):
         url = self.__construct_fhir_url(resourceType)
-        response = requests.post(url, data, headers=self.__get_headers())
+        body = json.dumps(data)
+        response = requests.post(url, body, headers=self.__get_headers())
         return response.json()
 
     # Update a FHIR resource...
-    def updateResource(self, resourceType, resourceId, data):
+    def update_resource(self, resourceType, resourceId, data):
         url = self.__construct_fhir_url(resourceType, resourceId)
-        response = requests.put(url, data, headers=self.__get_headers())
+        body = json.dumps(data)
+        response = requests.put(url, body, headers=self.__get_headers())
         return response.json()
 
     # Delete a FHIR resource...
-    def deleteResource(self, resourceType, resourceId):
+    def delete_resource(self, resourceType, resourceId):
         url = self.__construct_fhir_url(resourceType, resourceId)
         response = requests.delete(url, headers=self.__get_headers())
         return response.json()
@@ -56,10 +64,15 @@ class FHIRClient:
 
     # Get headers needed for requests
     def __get_headers(self):
-        return {
-            'Authorization': self.__get_auth_header_value(),
+        headers = {
             'Content-Type': 'application/json'
         }
+
+        # If there's an access token, add it to the headers...
+        if (self.access_token) and (self.access_token_type):
+            headers['Authorization'] = self.__get_auth_header_value()
+
+        return headers
 
     # Construct the FHIR URL...
     def __construct_fhir_url(self, resourceType, resourceId = None, historyVersion = None):
