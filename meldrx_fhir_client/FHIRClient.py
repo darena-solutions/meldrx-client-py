@@ -26,6 +26,25 @@ class FHIRClient:
         access_token = base64.b64encode(access_token.encode('utf-8')).decode('utf-8')
         return FHIRClient(base_url, access_token, "Basic")
 
+    # Initialize the FHIRClient with a client secret...
+    @staticmethod
+    def for_client_secret(meldrx_base_url, workspace_id, client_id, client_secret, scope):
+        # Do a client secret post to get an access token...
+        url = meldrx_base_url + '/' + workspace_id + '/connect/token'
+        data = {
+            'grant_type': 'client_credentials',
+            'scope': scope,
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Authorization': 'Basic ' + base64.b64encode((client_id + ':' + client_secret).encode('utf-8')).decode('utf-8')
+        }
+        response = requests.post(url, data, headers=headers)
+        response = response.json()
+        access_token = response['access_token']
+
+        return FHIRClient.for_bearer_token(meldrx_base_url, access_token)
+
     # Read a FHIR resource...
     def read_resource(self, resourceType, resourceId):
         url = self.__construct_fhir_url(resourceType, resourceId)
@@ -60,7 +79,7 @@ class FHIRClient:
 
     # Get the authorization header for this instance...
     def __get_auth_header_value(self):
-        return self.access_token_type + ' ' + self.access_token,
+        return self.access_token_type + ' ' + self.access_token
 
     # Get headers needed for requests
     def __get_headers(self):
