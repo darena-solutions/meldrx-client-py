@@ -3,3 +3,5 @@ build
 dist
 meldrx_fhir_client.egg-info
 config.py
+
+main.py

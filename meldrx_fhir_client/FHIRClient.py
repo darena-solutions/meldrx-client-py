@@ -29,8 +29,10 @@ class FHIRClient:
     # Initialize the FHIRClient with a client secret...
     @staticmethod
     def for_client_secret(meldrx_base_url, workspace_id, client_id, client_secret, scope):
+        token_url = meldrx_base_url + '/' + workspace_id + '/connect/token'
+        fhir_url = meldrx_base_url + '/api/meldrxfhir/' + workspace_id
+
         # Do a client secret post to get an access token...
-        url = meldrx_base_url + '/' + workspace_id + '/connect/token'
         data = {
             'grant_type': 'client_credentials',
             'scope': scope,
@@ -39,11 +41,12 @@ class FHIRClient:
             'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': 'Basic ' + base64.b64encode((client_id + ':' + client_secret).encode('utf-8')).decode('utf-8')
         }
-        response = requests.post(url, data, headers=headers)
+        verify = False
+        response = requests.post(token_url, data, headers=headers, verify=verify)
         response = response.json()
         access_token = response['access_token']
 
-        return FHIRClient.for_bearer_token(meldrx_base_url, access_token)
+        return FHIRClient.for_bearer_token(fhir_url, access_token)
 
     # Read a FHIR resource...
     def read_resource(self, resourceType, resourceId):
