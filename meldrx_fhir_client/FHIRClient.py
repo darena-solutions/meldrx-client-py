@@ -30,7 +30,7 @@ class FHIRClient:
     @staticmethod
     def for_client_secret(meldrx_base_url, workspace_id, client_id, client_secret, scope):
         token_url = meldrx_base_url + '/' + workspace_id + '/connect/token'
-        fhir_url = meldrx_base_url + '/api/meldrxfhir/' + workspace_id
+        fhir_url = meldrx_base_url + '/api/fhir/' + workspace_id
 
         # Do a client secret post to get an access token...
         data = {

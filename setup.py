@@ -7,7 +7,7 @@ setup(
     long_description_content_type='text/markdown',
     license='MIT',
     url='https://github.com/darena-solutions/meldrx-client-py',
-    version='0.0.6',
+    version='0.0.8',
     author='EM',
     author_email='eric@darenasolutions.com',
     packages=find_packages(),
